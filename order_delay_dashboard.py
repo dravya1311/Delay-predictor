@@ -20,8 +20,8 @@ st.caption("0 = On-time, 1 = Delayed (auto-detected)")
 @st.cache_data
 def load_files():
     # adjust these paths if needed
-    path_main = "/mnt/data/Delay Model.csv"
-    path_delay = "/mnt/data/Delay description csv.csv"
+    path_main = pd.read_csv('Delay Model.csv')
+    path_delay = pd.read_csv('Delay description csv.csv')
     df_main = pd.read_csv(path_main)
     df_delay = pd.read_csv(path_delay)
     return df_main, df_delay
