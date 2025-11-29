@@ -1,3 +1,32 @@
+import streamlit as st
+import pandas as pd
+import os
+
+st.title("DEBUG MODE: File Loading Test")
+
+st.subheader("Files available in working directory:")
+st.write(os.listdir("."))   # Shows all files that Streamlit Cloud can see
+
+# ---- Correct RAW GitHub file paths ----
+delay_model_url = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay%20Model.csv"
+delay_desc_url  = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay%20description%20csv.csv"
+
+st.subheader("Attempting to load CSV files...")
+
+try:
+    df_model = pd.read_csv(delay_model_url)
+    st.success("Delay Model.csv loaded successfully!")
+    st.write(df_model.head())
+except Exception as e:
+    st.error(f"Error loading Delay Model.csv: {e}")
+
+try:
+    df_desc = pd.read_csv(delay_desc_url)
+    st.success("Delay description csv.csv loaded successfully!")
+    st.write(df_desc.head())
+except Exception as e:
+    st.error(f"Error loading Delay description csv.csv: {e}")
+
 # order_delay_dashboard.py
 import streamlit as st
 import pandas as pd
