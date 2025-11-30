@@ -229,5 +229,5 @@ st.plotly_chart(fig8, use_container_width=True)
 # FOOTER
 # ---------------------------------------------------------------
 st.markdown("---")
-st.markdown("Dashboard completed successfully.")
+st.markdown("Dashboard completed successfully by RAVINDRA YADAV.")
 
