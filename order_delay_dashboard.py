@@ -70,13 +70,13 @@ st.markdown("---")
 # 1) Average sales per customer based on order_region
 # ---------------------------------------------------------------
 st.subheader("1) Average Sales Per Customer by Region")
-sales_region = df.groupby("order_region")["sales"].mean().reset_index()
+sales_region = df.groupby("market")["sales"].mean().reset_index()
 
 fig1 = px.bar(
     sales_region,
-    x="order_region",
+    x="market",
     y="sales",
-    title="Average Sales Per Customer by Region",
+    title="Average Sales Per Customer by Market",
     text_auto=True
 )
 st.plotly_chart(fig1, use_container_width=True)
