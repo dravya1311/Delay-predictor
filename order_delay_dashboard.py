@@ -97,19 +97,19 @@ fig2 = px.bar(
 st.plotly_chart(fig2, use_container_width=True)
 
 # ---------------------------------------------------------------
-# 3) Top 8 Order Countries & Regions (Marketwise)
+# 3) Top 5 Order Countries & Regions (Marketwise)
 # ---------------------------------------------------------------
-st.subheader("3) Top 8 Markets – By Order Count")
+st.subheader("3) Top 5 Markets – By Order Count")
 
 top_markets = df.groupby(["market", "order_country"]).size().reset_index(name="order_count")
-top5_markets = top_markets.sort_values("order_count", ascending=False).head(8)
+top5_markets = top_markets.sort_values("order_count", ascending=False).head(5)
 
 fig3 = px.bar(
-    top8_markets,
+    top5_markets,
     x="market",
     y="order_count",
     color="order_country",
-    title="Top 8 Order Markets"
+    title="Top 5 Order Markets"
 )
 st.plotly_chart(fig3, use_container_width=True)
 
