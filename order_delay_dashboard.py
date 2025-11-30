@@ -46,9 +46,9 @@ st.markdown("An end-to-end analysis of order performance, profitability, and del
 col1, col2, col3, col4 = st.columns(4)
 
 total_orders = df.shape[0]
-delayed_orders = df[df["label"] == 1].shape[0]
+delayed_orders = df[df["label"] == -1].shape[0]
 ontime_orders = df[df["label"] == 0].shape[0]
-early_orders = df[df["label"] == -1].shape[0]
+early_orders = df[df["label"] == 1].shape[0]
 
 delay_percent = round((delayed_orders / total_orders) * 100, 2)
 
@@ -212,7 +212,7 @@ st.subheader("8) Delay % by Shipping Mode")
 
 delay_by_ship = (
     df.groupby("shipping_mode")["label"]
-    .apply(lambda x: (x == 1).mean() * 100)   # % delayed
+    .apply(lambda x: (x == -1).mean() * 100)   # % delayed
     .reset_index(name="delay_percent")
 )
 
