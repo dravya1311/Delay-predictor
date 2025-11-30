@@ -97,19 +97,19 @@ fig2 = px.bar(
 st.plotly_chart(fig2, use_container_width=True)
 
 # ---------------------------------------------------------------
-# 3) Top 5 Order Countries & Regions (Marketwise)
+# 3) Top 8 Order Countries & Regions (Marketwise)
 # ---------------------------------------------------------------
-st.subheader("3) Top 5 Markets – By Order Count")
+st.subheader("3) Top 8 Markets – By Order Count")
 
 top_markets = df.groupby(["market", "order_country"]).size().reset_index(name="order_count")
-top5_markets = top_markets.sort_values("order_count", ascending=False).head(5)
+top5_markets = top_markets.sort_values("order_count", ascending=False).head(8)
 
 fig3 = px.bar(
-    top5_markets,
+    top8_markets,
     x="market",
     y="order_count",
     color="order_country",
-    title="Top 5 Order Markets"
+    title="Top 8 Order Markets"
 )
 st.plotly_chart(fig3, use_container_width=True)
 
@@ -155,34 +155,34 @@ fig5 = px.bar(
 st.plotly_chart(fig5, use_container_width=True)
 
 # ---------------------------------------------------------------
-# 6) Top 5 Most Sold Categories (Quantity & Revenue)
+# 6) Top 8 Most Sold Categories (Quantity & Revenue)
 # ---------------------------------------------------------------
-st.subheader("6) Top 5 Most Sold Categories")
+st.subheader("6) Top 8 Most Sold Categories")
 
 colA, colB = st.columns(2)
 
 with colA:
     qty = df.groupby("category_name")["order_item_quantity"].sum().reset_index()
-    qty_top5 = qty.sort_values("order_item_quantity", ascending=False).head(5)
+    qty_top5 = qty.sort_values("order_item_quantity", ascending=False).head(8)
 
     fig6A = px.bar(
-        qty_top5,
+        qty_top8,
         x="category_name",
         y="order_item_quantity",
-        title="Top 5 Categories (By Quantity Sold)",
+        title="Top 8 Categories (By Quantity Sold)",
         text_auto=True
     )
     st.plotly_chart(fig6A, use_container_width=True)
 
 with colB:
     rev = df.groupby("category_name")["sales"].sum().reset_index()
-    rev_top5 = rev.sort_values("sales", ascending=False).head(5)
+    rev_top5 = rev.sort_values("sales", ascending=False).head(8)
 
     fig6B = px.bar(
-        rev_top5,
+        rev_top8,
         x="category_name",
         y="sales",
-        title="Top 5 Categories (By Revenue)",
+        title="Top 8 Categories (By Revenue)",
         text_auto=True,
         color="sales"
     )
