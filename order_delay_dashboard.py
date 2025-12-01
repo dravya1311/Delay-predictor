@@ -295,24 +295,46 @@ else:
 st.subheader("Delayed Orders by Shipping Mode (counts)")
 delayed_mode = df_view[df_view["is_delayed"]].groupby("shipping_mode").size().reset_index(name="delayed_count").sort_values("delayed_count", ascending=False)
 if not delayed_mode.empty:
-    fig10 = px.bar(delayed_mode, x="shipping_mode", y="delayed_count", title="Delayed Orders by Shipping Mode (counts)", color_discrete_sequence=[ALERT])
+    fig10 = px.bar(delayed_mode, x="shipping_mode", y="delayed_count",
+                   title="Delayed Orders by Shipping Mode (counts)",
+                   color="shipping_mode")
     st.plotly_chart(fig10, use_container_width=True)
 else:
     st.info("No delayed orders present for current filter.")
 
 # -------------------------
-# Chart 11: Order region wise delay % (donut)
+# FIX: Compute reg_grp_all BEFORE using it
 # -------------------------
-st.subheader("Order-region — Distribution of Delays (donut)")
+reg_grp_all = (
+    df_view.groupby("order_region")["is_delayed"]
+    .mean()
+    .reset_index()
+)
+reg_grp_all["delay_percent"] = reg_grp_all["is_delayed"] * 100
+
+# -------------------------
+# Chart 11: Order-region wise delay % (donut)
+# -------------------------
+st.subheader("Order-region — Delay % Distribution (donut)")
+
 if not reg_grp_all.empty:
-    pie = go.Figure(go.Pie(labels=reg_grp_all["order_region"], values=reg_grp_all["delayed_orders"], hole=0.45))
-    pie.update_layout(title="Delayed Orders by Region (absolute)", legend_title="Region")
-    st.plotly_chart(pie, use_container_width=True)
+    fig11 = go.Figure(
+        go.Pie(
+            labels=reg_grp_all["order_region"],
+            values=reg_grp_all["delay_percent"],
+            hole=0.45
+        )
+    )
+    fig11.update_layout(
+        title="Delay % by Region",
+        legend_title="Region"
+    )
+    st.plotly_chart(fig11, use_container_width=True)
 else:
     st.info("No region delay data to show.")
 
 # -------------------------
-# Footer notes (minimal)
+# Footer notes
 # -------------------------
 st.markdown("---")
 st.markdown(
