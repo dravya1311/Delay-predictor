@@ -8,7 +8,7 @@ import re
 st.set_page_config(page_title="Order Delay Analysis", layout="wide")
 
 # ---------- CONFIG ----------
-CSV_URL = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay%20Model.csv"
+CSV_URL = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay_Model.csv"
 
 # ---------- HELPERS ----------
 def norm(c: str) -> str:
