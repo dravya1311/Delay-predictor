@@ -1,212 +1,147 @@
+# order_delay_dashboard.py
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
+import re
 
-st.set_page_config(page_title="Order Delay Analytics Dashboard", layout="wide")
+st.set_page_config(page_title="Order Delay Analysis", layout="wide")
 
-# -------------------------------------------------------------------
-# Utility Function
-# -------------------------------------------------------------------
-def load_data(uploaded_file):
+# ---------- CONFIG ----------
+CSV_URL = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay%20Model.csv"
+
+# ---------- HELPERS ----------
+def norm(c: str) -> str:
+    return re.sub(r'[^a-z0-9]+', '_', str(c).strip().lower())
+
+def load_csv(url: str) -> pd.DataFrame:
     try:
-        df = pd.read_csv(uploaded_file)
-        df.columns = df.columns.str.strip()  # clean column names
+        df = pd.read_csv(url)
+        df.columns = [col.strip() for col in df.columns]
         return df
     except Exception as e:
-        st.error(f"Failed to load CSV: {e}")
-        return None
+        st.error(f"Failed to load CSV from GitHub: {e}")
+        return pd.DataFrame()
 
+def map_cols(df: pd.DataFrame):
+    """Return mapping of normalized_name -> actual column name present in df."""
+    return {norm(c): c for c in df.columns}
 
-# -------------------------------------------------------------------
-# Sidebar
-# -------------------------------------------------------------------
-st.sidebar.header("Upload Delay Model CSV")
-uploaded_file = st.sidebar.file_uploader("Upload Delay_Model.csv", type=["csv"])
+def safe_col(mapper, *names):
+    """Return actual column name for the first normalized name that exists, else None."""
+    for n in names:
+        key = norm(n)
+        if key in mapper:
+            return mapper[key]
+    return None
 
-if uploaded_file is None:
-    st.warning("Upload Delay_Model.csv to view the dashboard.")
+# ---------- LOAD DATA ----------
+df = load_csv(CSV_URL)
+if df.empty:
     st.stop()
 
-df = load_data(uploaded_file)
-if df is None:
-    st.stop()
+col_map = map_cols(df)
 
+# ---------- REQUIRED COLUMNS (user-provided names) ----------
+# We'll search among these normalized variants
+COL_LABEL = safe_col(col_map, "label")
+COL_SHIP = safe_col(col_map, "Shipping mode", "shipping mode", "shipping_mode", "shippingmode")
+COL_REGION = safe_col(col_map, "Order region", "order region", "order_region", "region")
+COL_SALES = safe_col(col_map, "Sales per customer", "sales per customer", "sales_per_customer", "sales")
+COL_ORDERID = safe_col(col_map, "Order id", "order id", "Order_ID", "order_id")
 
-# -------------------------------------------------------------------
-# Mandatory Columns
-# -------------------------------------------------------------------
-required_cols = [
-    "Order id", "customer id", "Order region", "Order Country", 
-    "Shipping mode", "Category name", "Product name",
-    "Order Profit per order", "Sales per customer", "Order item quantity",
-    "label"
-]
-
-missing = [col for col in required_cols if col not in df.columns]
+missing = []
+if COL_LABEL is None: missing.append("label")
+if COL_SHIP is None: missing.append("Shipping mode")
+if COL_REGION is None: missing.append("Order region")
+if COL_SALES is None: missing.append("Sales per customer")
 
 if missing:
-    st.error(f"Missing columns: {missing}")
+    st.error(f"Missing required column(s): {missing}. Check CSV header names and try again.")
     st.stop()
 
+# ---------- NORMALIZE LABEL (user rule) ----------
+# User: -1 = delayed, 0 = on-time, 1 = early
+df[COL_LABEL] = pd.to_numeric(df[COL_LABEL], errors="coerce")
+# force any invalid to NaN, then keep them (we'll treat NaN as not delayed)
+df[COL_LABEL] = df[COL_LABEL].fillna(0).astype(int)
 
-# -------------------------------------------------------------------
-# Data Preprocessing
-# -------------------------------------------------------------------
-# Rename for easier access (optional)
-df.rename(columns={
-    "Order id": "Order_ID",
-    "customer id": "Customer_ID",
-    "Order region": "Order_Region",
-    "Order Country": "Order_Country",
-    "Shipping mode": "Shipping_Mode",
-    "Category name": "Category_Name",
-    "Product name": "Product_Name",
-    "Order Profit per order": "Profit",
-    "Sales per customer": "Sales_Per_Customer",
-    "Order item quantity": "Quantity",
-}, inplace=True)
+# For clarity create helper columns
+df["_is_delayed"] = df[COL_LABEL] == -1
+df["_is_early"] = df[COL_LABEL] == 1
+df["_is_ontime"] = df[COL_LABEL] == 0
 
-# Label mapping: -1 delayed, 0 on-time, 1 early
-df["Delay_Flag"] = df["label"].map({-1: "Delayed", 0: "On-Time", 1: "Early"})
+# ---------- METRICS ----------
+total_orders = len(df)
+total_delayed = int(df["_is_delayed"].sum())
+delay_pct_overall = round(total_delayed / total_orders * 100, 2) if total_orders else 0.0
+most_delayed_mode = None
 
+# ---------- SHIPPING MODE: delay count & percent ----------
+ship_grp = df.groupby(COL_SHIP).agg(
+    total_orders=("{}".format(COL_SHIP), "count"),
+    delayed_count=("_is_delayed", "sum")
+).reset_index()
+ship_grp["delay_pct"] = (ship_grp["delayed_count"] / ship_grp["total_orders"] * 100).round(2)
+ship_grp = ship_grp.sort_values("delay_pct", ascending=False).reset_index(drop=True)
+if not ship_grp.empty:
+    most_delayed_mode = ship_grp.iloc[0][COL_SHIP]
 
-# -------------------------------------------------------------------
-# KPI Section
-# -------------------------------------------------------------------
-st.title("📦 Order Delay Prediction Dashboard")
+# ---------- ORDER REGION: delay count & percent ----------
+region_grp = df.groupby(COL_REGION).agg(
+    total_orders=("{}".format(COL_REGION), "count"),
+    delayed_count=("_is_delayed", "sum")
+).reset_index()
+region_grp["delay_pct"] = (region_grp["delayed_count"] / region_grp["total_orders"] * 100).round(2)
+region_grp = region_grp.sort_values("delay_pct", ascending=False).reset_index(drop=True)
+
+# ---------- LAYOUT ----------
+st.title("Order Delay Analysis — (label: -1=Delayed, 0=On-time, 1=Early)")
+st.markdown("**Key summary** — delay = `label == -1`")
+
+k1, k2, k3, k4 = st.columns([1.2,1.2,1.2,1.4])
+k1.metric("Total Orders", f"{total_orders:,}")
+k2.metric("Total Delayed (label = -1)", f"{total_delayed:,}")
+k3.metric("Overall Delay %", f"{delay_pct_overall}%")
+k4.metric("Most Delayed Shipping Mode", most_delayed_mode if most_delayed_mode is not None else "N/A")
+
 st.markdown("---")
 
-col1, col2, col3 = st.columns(3)
+# ---------- SHIPPING MODE VISUALS ----------
+st.subheader("Delay % by Shipping Mode")
+st.write("Delay % = delayed_count / total_orders for that shipping mode")
 
-# Total Orders
-col1.metric("Total Orders", len(df))
-
-# Delay %
-delay_pct = (df["label"].eq(-1).sum() / len(df)) * 100
-col2.metric("Delay %", f"{delay_pct:.2f}%")
-
-# Top Region by Sales
-top_region = df.groupby("Order_Region")["Sales_Per_Customer"].sum().idxmax()
-col3.metric("Top Revenue Region", top_region)
-
+if ship_grp.empty:
+    st.info("No shipping mode data available.")
+else:
+    st.dataframe(ship_grp[[COL_SHIP, "total_orders", "delayed_count", "delay_pct"]], use_container_width=True)
+    fig_ship = px.bar(ship_grp, x=COL_SHIP, y="delay_pct", text="delay_pct",
+                      title="Delay % by Shipping Mode (higher = worse)", labels={"delay_pct":"Delay %"})
+    fig_ship.update_traces(texttemplate="%{text}%")
+    st.plotly_chart(fig_ship, use_container_width=True)
 
 st.markdown("---")
-st.subheader("Market Insights")
 
+# ---------- ORDER REGION VISUALS ----------
+st.subheader("Delay % by Order Region")
+st.write("Delay % = delayed_count / total_orders for that region")
 
-# -------------------------------------------------------------------
-# 1) Average sales per customer (order_region)
-# -------------------------------------------------------------------
-st.markdown("### 1) Average Sales per Customer by Order Region")
-avg_sales_region = df.groupby("Order_Region")["Sales_Per_Customer"].mean().reset_index()
+if region_grp.empty:
+    st.info("No order region data available.")
+else:
+    st.dataframe(region_grp[[COL_REGION, "total_orders", "delayed_count", "delay_pct"]], use_container_width=True)
+    fig_reg = px.bar(region_grp, x=COL_REGION, y="delay_pct", text="delay_pct",
+                     title="Delay % by Order Region", labels={"delay_pct":"Delay %"})
+    fig_reg.update_traces(texttemplate="%{text}%")
+    st.plotly_chart(fig_reg, use_container_width=True)
 
-fig1 = px.bar(avg_sales_region, x="Order_Region", y="Sales_Per_Customer",
-              title="Avg Sales per Customer", text_auto=True)
-st.plotly_chart(fig1, use_container_width=True)
+st.markdown("---")
 
+# ---------- OPTIONAL: export results ----------
+with st.expander("Export / download results"):
+    ship_csv = ship_grp.to_csv(index=False)
+    reg_csv = region_grp.to_csv(index=False)
+    st.download_button("Download shipping-mode delay table (CSV)", ship_csv, "delay_by_shipping_mode.csv", "text/csv")
+    st.download_button("Download region delay table (CSV)", reg_csv, "delay_by_region.csv", "text/csv")
 
-# -------------------------------------------------------------------
-# 2) Average Profit per order (order_region)
-# -------------------------------------------------------------------
-st.markdown("### 2) Average Profit per Order by Region")
-avg_profit_region = df.groupby("Order_Region")["Profit"].mean().reset_index()
-
-fig2 = px.bar(avg_profit_region, x="Order_Region", y="Profit",
-              title="Avg Profit per Order", text_auto=True)
-st.plotly_chart(fig2, use_container_width=True)
-
-
-# -------------------------------------------------------------------
-# 3) Top 5 countries and regions (marketwise)
-# -------------------------------------------------------------------
-st.markdown("### 3) Top 5 Order Countries & Regions by Revenue")
-
-top_countries = df.groupby("Order_Country")["Sales_Per_Customer"].sum().nlargest(5).reset_index()
-top_regions = df.groupby("Order_Region")["Sales_Per_Customer"].sum().nlargest(5).reset_index()
-
-colA, colB = st.columns(2)
-
-with colA:
-    fig3A = px.bar(top_countries, x="Order_Country", y="Sales_Per_Customer",
-                   title="Top 5 Countries")
-    st.plotly_chart(fig3A, use_container_width=True)
-
-with colB:
-    fig3B = px.bar(top_regions, x="Order_Region", y="Sales_Per_Customer",
-                   title="Top 5 Regions")
-    st.plotly_chart(fig3B, use_container_width=True)
-
-
-# -------------------------------------------------------------------
-# 4) Top 8 most profitable categories
-# -------------------------------------------------------------------
-st.markdown("### 4) Top 8 Most Profitable Categories")
-
-top_categories = df.groupby("Category_Name")["Profit"].sum().nlargest(8).reset_index()
-
-fig4 = px.bar(top_categories, x="Category_Name", y="Profit",
-              title="Most Profitable Categories")
-st.plotly_chart(fig4, use_container_width=True)
-
-
-# -------------------------------------------------------------------
-# 5) Most profitable product by region
-# -------------------------------------------------------------------
-st.markdown("### 5) Most Profitable Product by Region")
-
-prof_prod = df.groupby(["Order_Region", "Product_Name"])["Profit"].sum()
-prof_prod = prof_prod.reset_index().sort_values(["Order_Region", "Profit"], ascending=[True, False])
-
-# pick top 1 per region
-prof_top = prof_prod.groupby("Order_Region").head(1)
-
-fig5 = px.bar(prof_top, x="Order_Region", y="Profit", color="Product_Name",
-              title="Most Profitable Product by Region", text="Product_Name")
-st.plotly_chart(fig5, use_container_width=True)
-
-
-# -------------------------------------------------------------------
-# 6) Top 5 most sold categories (quantity + revenue)
-# -------------------------------------------------------------------
-st.markdown("### 6) Top 5 Most Sold Categories (Quantity & Revenue)")
-
-cat_qty = df.groupby("Category_Name")["Quantity"].sum().nlargest(5).reset_index()
-cat_rev = df.groupby("Category_Name")["Sales_Per_Customer"].sum().nlargest(5).reset_index()
-
-colC, colD = st.columns(2)
-
-with colC:
-    fig6A = px.bar(cat_qty, x="Category_Name", y="Quantity",
-                   title="Top Categories by Quantity Sold")
-    st.plotly_chart(fig6A, use_container_width=True)
-
-with colD:
-    fig6B = px.bar(cat_rev, x="Category_Name", y="Sales_Per_Customer",
-                   title="Top Categories by Revenue")
-    st.plotly_chart(fig6B, use_container_width=True)
-
-
-# -------------------------------------------------------------------
-# 7) Preferred shipping mode by region
-# -------------------------------------------------------------------
-st.markdown("### 7) Preferred Shipping Mode by Region")
-
-ship_pref = df.groupby(["Order_Region", "Shipping_Mode"]).size().reset_index(name="Count")
-
-fig7 = px.bar(ship_pref, x="Order_Region", y="Count", color="Shipping_Mode",
-              title="Shipping Mode Preference by Region", barmode="group")
-st.plotly_chart(fig7, use_container_width=True)
-
-
-# -------------------------------------------------------------------
-# 8) Delayed orders by shipping mode
-# -------------------------------------------------------------------
-st.markdown("### 8) Delayed Orders by Shipping Mode")
-
-delay_ship = df[df["label"] == -1].groupby("Shipping_Mode").size().reset_index(name="Delayed_Count")
-
-fig8 = px.bar(delay_ship, x="Shipping_Mode", y="Delayed_Count",
-              title="Delayed Orders by Shipping Mode")
-st.plotly_chart(fig8, use_container_width=True)
-
-st.success("Dashboard ready.")
+st.success("Analysis complete.")
