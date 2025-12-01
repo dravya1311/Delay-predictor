@@ -358,7 +358,7 @@ else:
 # -------------------------
 st.markdown("---")
 st.markdown(
-    "Visual-only dashboard — no raw tables displayed. "
-    "Delay mapping used: **label = -1 → delayed**, **0 → on-time**, **1 → early**. "
+    "Dashboard by RAVINDRA YADAV . "
+    
     "Select an Order Region in the sidebar to filter all charts."
 )
