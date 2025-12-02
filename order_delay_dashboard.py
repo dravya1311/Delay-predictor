@@ -107,7 +107,7 @@ col1, col2, col3, col4 = st.columns(4)
 total_orders = len(df_view)
 delayed_orders = df_view["is_delayed"].sum()
 delay_rate = (delayed_orders / total_orders * 100) if total_orders else 0
-avg_sales (dollars) = df_view["sales_per_customer"].mean()
+avg_sales_dollars = df_view["sales_per_customer"].mean()
 
 with col1:
     st.metric("Total Orders", f"{total_orders:,}")
