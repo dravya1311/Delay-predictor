@@ -220,7 +220,7 @@ st.subheader("Most Profitable Product by Region")
 
 prod_region = (
     df_view.groupby(["order_region", "product_name"])["profit_per_order"]
-    .sum().reset_index()
+    .mean().reset_index()
 )
 
 max_prod = prod_region.loc[prod_region.groupby("order_region")["profit_per_order"].idxmax()]
