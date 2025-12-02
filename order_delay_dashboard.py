@@ -107,7 +107,7 @@ col1, col2, col3, col4 = st.columns(4)
 total_orders = len(df_view)
 delayed_orders = df_view["is_delayed"].sum()
 delay_rate = (delayed_orders / total_orders * 100) if total_orders else 0
-avg_sales = df_view["sales_per_customer"].mean()
+avg_sales($) = df_view["sales_per_customer"].mean()
 
 with col1:
     st.metric("Total Orders", f"{total_orders:,}")
@@ -137,7 +137,7 @@ if not reg_grp.empty:
         color="is_delayed",
         color_continuous_scale="Reds"
     )
-    fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+    fig.update_traces(textposition="outside", texttemplate="%{text:,}")
     st.plotly_chart(fig, use_container_width=True)
 else:
     st.info("No data available.")
@@ -145,7 +145,7 @@ else:
 # -------------------------------------------------------------
 # 2. Average Sales per Customer — Region
 # -------------------------------------------------------------
-st.subheader("Average Sales per Customer by Region")
+st.subheader("Average Sales per Customer by Region in US dollars")
 
 grp = df_view.groupby("order_region")["sales_per_customer"].mean().reset_index()
 
@@ -160,7 +160,7 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 # 3. Average Profit per Order — Region
 # -------------------------------------------------------------
-st.subheader("Average Profit per Order by Region")
+st.subheader("Average Profit per Order by Region in US dollars")
 
 grp = df_view.groupby("order_region")["profit_per_order"].mean().reset_index()
 
@@ -173,9 +173,9 @@ fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 4. Top 5 Order Country (by count)
+# 4. Top 5 Order Country 
 # -------------------------------------------------------------
-st.subheader("Top 5 Order Countries")
+st.subheader("Top 5 Order Countries (count)")
 
 top_country = (
     df_view.groupby("order_country").size()
@@ -192,7 +192,7 @@ fig = px.bar(
     text="orders",
     color="orders"
 )
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+fig.update_traces(textposition="outside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
