@@ -253,7 +253,7 @@ with colA:
         top_qty, x="category_name", y="order_item_quantity",
         title="Top 5 Categories by Quantity Sold", text="order_item_quantity"
     )
-    fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+    fig.update_traces(textposition="outside", texttemplate="%{text:,}")
     st.plotly_chart(fig, use_container_width=True)
 
 with colB:
