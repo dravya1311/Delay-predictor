@@ -275,7 +275,7 @@ fig = px.bar(
     pref, x="order_region", y="count", color="shipping_mode",
     title="Shipping Mode Preference by Region", text="count"
 )
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+fig.update_traces(textposition="outside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
