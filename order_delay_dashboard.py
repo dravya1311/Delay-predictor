@@ -294,7 +294,7 @@ fig = px.bar(
     title="Delayed Orders by Shipping Mode",
     text="delayed_count", color="delayed_count", color_continuous_scale="Reds"
 )
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+fig.update_traces(textposition="outside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
