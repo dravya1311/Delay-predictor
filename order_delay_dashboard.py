@@ -202,7 +202,7 @@ st.subheader("Top 8 Most Profitable Categories")
 
 cat_profit = (
     df_view.groupby("category_name")["profit_per_order"]
-    .sum().reset_index().sort_values("profit_per_order", ascending=False).head(8)
+    .mean().reset_index().sort_values("profit_per_order", ascending=False).head(8)
 )
 
 fig = px.bar(
