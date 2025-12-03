@@ -13,7 +13,7 @@ import os, re
 # PAGE CONFIG
 # -------------------------------------------------------------
 st.set_page_config(
-    page_title="Order Delay Intelligence Dashboard",
+    page_title="Supply Chain & Logistics Performance Dashboard",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
