@@ -326,13 +326,13 @@ st.markdown(
     """
     <div style="
         position: fixed;
-        bottom: 5px;
+        bottom: 15px;
         right: 15px;
         background-color: rgba(10, 26, 47, 0.85);
         padding: 8px 14px;
         border-radius: 6px;
         color: white;
-        font-size: 13px;
+        font-size: 15px;
         z-index: 9999;
     ">
         Created by <b>Ravindra Yadav</b>
