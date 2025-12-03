@@ -323,6 +323,6 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 st.markdown("---")
 st.markdown(
-    "Delay mapping: **-1 = delayed**, **0 = on-time**, **1 = early**. "
-    "All numbers shown with 2-decimal precision."
+    "Created by Ravindra Yadav "
+
 )
