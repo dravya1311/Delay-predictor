@@ -318,6 +318,42 @@ fig = go.Figure(
 fig.update_layout(title="Delay Percentage by Region")
 st.plotly_chart(fig, use_container_width=True)
 
+# KPI: Delay breakup by order-region for STANDARD CLASS only
+# ---------------------------------------------------------------
+st.subheader("Delay Breakup by Order-Region (Standard Class)")
+
+# Use filtered dataframe instead of df_view
+std_df = filtered[filtered["shipping_mode"] == "Standard Class"].copy()
+
+# Identify delayed orders (label = -1)
+std_df["is_delayed"] = std_df["label"] == -1
+
+# Group by region
+delay_region_std = (
+    std_df.groupby("order_region")["is_delayed"]
+    .mean()
+    .reset_index()
+    .rename(columns={"is_delayed": "delay_rate"})
+)
+
+# Graph
+fig_std_delay = px.bar(
+    delay_region_std,
+    x="order_region",
+    y="delay_rate",
+    text=delay_region_std["delay_rate"].round(2),
+    title="Delay % by Order-Region — Standard Class",
+    color="delay_rate"
+)
+
+fig_std_delay.update_traces(textposition="outside")
+fig_std_delay.update_layout(
+    yaxis_title="Delay Rate (0 = none, 1 = fully delayed)",
+    xaxis_title="Order Region"
+)
+
+st.plotly_chart(fig_std_delay, use_container_width=True)
+# ---------------------------------------------------------------
 # -------------------------------------------------------------
 # FOOTER
 # -------------------------------------------------------------
