@@ -323,6 +323,21 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 st.markdown("---")
 st.markdown(
-                                            "Created by Ravindra Yadav "
-
+    """
+    <div style="
+        position: fixed;
+        bottom: 10px;
+        right: 15px;
+        background-color: rgba(10, 26, 47, 0.85);
+        padding: 8px 14px;
+        border-radius: 6px;
+        color: white;
+        font-size: 13px;
+        z-index: 9999;
+    ">
+        Created by <b>Ravindra Yadav</b>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
+
