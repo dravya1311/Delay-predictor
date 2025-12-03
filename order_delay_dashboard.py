@@ -25,7 +25,7 @@ st.markdown(
     """
     <div style="background-color:#0A1A2F; padding:25px; border-radius:8px;">
         <h1 style="color:white; text-align:center; font-size:42px; margin-bottom:5px;">
-            Order Delay Intelligence Dashboard
+            Supply Chain & Logistics Performance Dashboard
         </h1>
         <h3 style="color:#A3C4F3; text-align:center; font-weight:300; margin-top:0;">
             Predictive & Diagnostic Insights for E-commerce Delivery Performance
