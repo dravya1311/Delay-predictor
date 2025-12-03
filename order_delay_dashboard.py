@@ -326,7 +326,7 @@ st.markdown(
     """
     <div style="
         position: fixed;
-        bottom: 1px;
+        bottom: 15px;
         Left: 15px;
         background-color: rgba(10, 26, 47, 0.85);
         padding: 8px 14px;
