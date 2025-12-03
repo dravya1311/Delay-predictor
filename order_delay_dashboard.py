@@ -326,18 +326,16 @@ st.markdown(
     """
     <div style="
         position: fixed;
-        bottom: 15px;
-        Left: 15px;
-        background-color: rgba(10, 26, 47, 0.85);
-        padding: 8px 14px;
-        border-radius: 6px;
-        color: white;
-        font-size: 15px;
-        z-index: 9999;
+        bottom: 10px;
+        right: 15px;
+        color: #A3C4F3;
+        font-size: 16px;
+        font-weight: 500;
     ">
-        Created by <b>Ravindra Yadav</b>
+        Created by <span style="color:#0B6EFD;">Ravindra Yadav</span>
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
