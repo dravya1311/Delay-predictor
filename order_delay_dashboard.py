@@ -327,7 +327,7 @@ st.markdown(
     <div style="
         position: fixed;
         bottom: 10px;
-        right: 15px;
+       left: 15px;
         color: #A3C4F3;
         font-size: 16px;
         font-weight: 500;
