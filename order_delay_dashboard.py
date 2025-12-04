@@ -123,7 +123,7 @@ st.markdown("---")
 # -------------------------------------------------------------
 # 1. Delayed Orders by Region
 # -------------------------------------------------------------
-st.subheader("Delayed Orders in Count by Region")
+st.subheader("Delayed Orders by Region (count)"
 
 reg_grp = df_view.groupby("order_region")["is_delayed"].sum().reset_index()
 
@@ -145,7 +145,7 @@ else:
 # -------------------------------------------------------------
 # 2. Average Sales per Customer — Region
 # -------------------------------------------------------------
-st.subheader("Average Sales per Customer by Region")
+st.subheader("Average Sales per Customer by Region ($)")
 
 grp = df_view.groupby("order_region")["sales_per_customer"].mean().reset_index()
 
