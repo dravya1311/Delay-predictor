@@ -116,7 +116,7 @@ with col2:
 with col3:
     st.metric("Delay Rate", f"{delay_rate:.1f}%")
 with col4:
-    st.metric("Avg Sales per Customer (dollars)", f"{avg_sales:.2f}")
+    st.metric("Avg Sales per Customer ($)", f"{avg_sales:.2f}")
 
 st.markdown("---")
 
