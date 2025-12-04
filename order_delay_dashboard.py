@@ -123,7 +123,7 @@ st.markdown("---")
 # -------------------------------------------------------------
 # 1. Delayed Orders by Region
 # -------------------------------------------------------------
-st.subheader("Delayed Orders by Region (count)"
+st.subheader("Delayed Orders by Region (count))"
 
 reg_grp = df_view.groupby("order_region")["is_delayed"].sum().reset_index()
 
