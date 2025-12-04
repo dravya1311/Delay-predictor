@@ -258,7 +258,7 @@ with colA:
 
 with colB:
     fig = px.bar(
-        top_rev, x="category_name", y="sales_per_customer",
+        top_rev, x="category_name", y="sales",
         title="Top 5 Categories by Revenue in dollars", text="sales_per_customer"
     )
     fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
