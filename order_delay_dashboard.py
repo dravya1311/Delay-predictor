@@ -239,7 +239,7 @@ st.subheader("Top 5 Most Sold Categories")
 
 cat_sales = (
     df_view.groupby("category_name")
-    .agg({"order_item_quantity": "sum", "sales_per_customer": "sum"})
+    .agg({"order_item_quantity": "sum", "sales": "sum"})
     .reset_index()
 )
 
