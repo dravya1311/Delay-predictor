@@ -244,7 +244,7 @@ cat_sales = (
 )
 
 top_qty = cat_sales.sort_values("order_item_quantity", ascending=False).head(5)
-top_rev = cat_sales.sort_values("sales_per_customer", ascending=False).head(5)
+top_rev = cat_sales.sort_values("sales", ascending=False).head(5)
 
 colA, colB = st.columns(2)
 
