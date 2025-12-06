@@ -385,7 +385,7 @@ fig_prod.update_layout(
     yaxis_title="Product"
 )
 
-st.plotly_chart(fig_prod, use_container_width=True)
+st.plotly_chart(fig_prod, use_container_width=False)
 # FOOTER
 # -------------------------------------------------------------
 st.markdown("---")
