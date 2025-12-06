@@ -28,7 +28,7 @@ st.markdown(
             Supply Chain & Logistics Performance Dashboard
         </h1>
         <h3 style="color:#A3C4F3; text-align:center; font-weight:300; margin-top:0;">
-            Predictive & Diagnostic Insights for E-commerce Delivery Performance
+            Diagnostic Insights for E-commerce Delivery Performance
         </h3>
     </div>
     """,
