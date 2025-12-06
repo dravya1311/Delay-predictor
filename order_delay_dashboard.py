@@ -354,7 +354,38 @@ fig_std_delay.update_layout(
 
 st.plotly_chart(fig_std_delay, use_container_width=True)
 # ---------------------------------------------------------------
+# KPI: 10 Most Delayed Products
 # -------------------------------------------------------------
+
+# Average delay score per product
+prod_delay = (
+    filtered.groupby("product_name")["label"]
+    .mean()
+    .reset_index()
+    .rename(columns={"label": "avg_delay"})
+)
+
+# Select most delayed → lowest average delay (closest to -1)
+top10_delayed_products = prod_delay.nsmallest(10, "avg_delay")
+
+# Plot
+fig_prod = px.bar(
+    top10_delayed_products,
+    x="avg_delay",
+    y="product_name",
+    orientation="h",
+    color="avg_delay",
+    title="Top 10 Most Delayed Products",
+    text=top10_delayed_products["avg_delay"].round(2)
+)
+
+fig_prod.update_traces(textposition="outside")
+fig_prod.update_layout(
+    xaxis_title="Avg Delay Score (-1 = Worst)",
+    yaxis_title="Product"
+)
+
+st.plotly_chart(fig_prod, use_container_width=True)
 # FOOTER
 # -------------------------------------------------------------
 st.markdown("---")
@@ -368,7 +399,7 @@ st.markdown(
         font-size: 16px;
         font-weight: 500;
     ">
-        Created by <span style="color:#0B6EFD;">Ravindra Yadav</span>
+        Developed by <span style="color:#0B6EFD;">Ravindra Yadav</span>
     </div>
     """,
     unsafe_allow_html=True
