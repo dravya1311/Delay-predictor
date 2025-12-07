@@ -314,7 +314,7 @@ fig = go.Figure(
         textinfo="label+percent",
     )
 )
-fig.update_layout(title="Delay Percentage by Region")
+
 st.plotly_chart(fig, use_container_width=True)
 #-----------------------------------------------------------------
 # KPI: Delay breakup by order-region for STANDARD CLASS only
