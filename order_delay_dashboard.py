@@ -121,6 +121,26 @@ with col4:
 st.markdown("---")
 
 # -------------------------------------------------------------
+# 4. Top 5 Order Country (by count)
+# -------------------------------------------------------------
+st.subheader("Top 5 Countries by No. of orders")
+
+top_country = (
+    df_view.groupby("order_country").size()
+    .reset_index(name="orders")
+    .sort_values("orders", ascending=False)
+    .head(5)
+)
+
+fig = px.bar(
+    top_country,
+    x="order_country",
+    y="orders",
+    text="orders",
+    color="orders"
+)
+fig.update_traces(textposition="outside", texttemplate="%{text:,}")
+st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
 # 2. Average Sales per Customer — Region
@@ -150,27 +170,6 @@ fig = px.bar(
 fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
 
-# -------------------------------------------------------------
-# 4. Top 5 Order Country (by count)
-# -------------------------------------------------------------
-st.subheader("Top 5 Order Countries by No. of orders")
-
-top_country = (
-    df_view.groupby("order_country").size()
-    .reset_index(name="orders")
-    .sort_values("orders", ascending=False)
-    .head(5)
-)
-
-fig = px.bar(
-    top_country,
-    x="order_country",
-    y="orders",
-    text="orders",
-    color="orders"
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:,}")
-st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
 # 5. Top 8 Most Profitable Categories
