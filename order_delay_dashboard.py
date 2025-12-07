@@ -370,7 +370,7 @@ top5_delayed_products = prod_delay.nsmallest(5, "avg_delay")
 
 # Plot
 fig_prod = px.bar(
-    top5_delayed_products,
+    
     x="avg_delay",
     y="product_name",
     orientation="h",
