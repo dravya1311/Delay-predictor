@@ -208,7 +208,7 @@ fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 7. Top 8 Most Sold Categories — Quantity + Revenue
+# 7. Top 8 Most Sold Products — Quantity + Revenue
 # -------------------------------------------------------------
 
 
@@ -228,7 +228,7 @@ with colA:
         top_qty, x="product_name", y="order_item_quantity",
         title="Top 5 Products by Quantity Sold", text="order_item_quantity"
     )
-    fig.update_traces(textposition="outside", texttemplate="%{text:,}")
+    fig.update_traces(textposition="outside", texttemplate="%{text:,.2f}")
     st.plotly_chart(fig, use_container_width=True)
 
 with colB:
