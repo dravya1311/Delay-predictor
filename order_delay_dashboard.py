@@ -132,7 +132,6 @@ if not reg_grp.empty:
         reg_grp,
         x="order_region",
         y="is_delayed",
-        title="Delayed Orders by Region",
         text="is_delayed",
         color="is_delayed",
         color_continuous_scale="Reds"
@@ -151,7 +150,6 @@ grp = df_view.groupby("order_region")["sales_per_customer"].mean().reset_index()
 
 fig = px.bar(
     grp, x="order_region", y="sales_per_customer",
-    title="Average Sales per Customer by Region",
     text="sales_per_customer", color="sales_per_customer"
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
@@ -166,7 +164,6 @@ grp = df_view.groupby("order_region")["profit_per_order"].mean().reset_index()
 
 fig = px.bar(
     grp, x="order_region", y="profit_per_order",
-    title="Average Profit per Order by Region",
     text="profit_per_order", color="profit_per_order"
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
@@ -188,7 +185,6 @@ fig = px.bar(
     top_country,
     x="order_country",
     y="orders",
-    title="Top 5 Order Countries",
     text="orders",
     color="orders"
 )
