@@ -235,7 +235,7 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 # 7. Top 5 Most Sold Categories — Quantity + Revenue
 # -------------------------------------------------------------
-st.subheader("Top 5 Most Sold Categories")
+
 
 cat_sales = (
     df_view.groupby("category_name")
