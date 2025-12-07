@@ -158,7 +158,7 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 # 3. Average Profit per Order — Region
 # -------------------------------------------------------------
-st.subheader("Average Profit per Order by Region")
+st.subheader("Average Profit per Order by Region ($)")
 
 grp = df_view.groupby("order_region")["profit_per_order"].mean().reset_index()
 
