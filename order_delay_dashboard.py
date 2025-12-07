@@ -216,7 +216,7 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 # 6. Most Profitable Product — Region-wise
 # -------------------------------------------------------------
-st.subheader("Most Profitable Product by Region")
+st.subheader("Most Profitable Products by Region")
 
 prod_region = (
     df_view.groupby(["order_region", "product_name"])["profit_per_order"]
