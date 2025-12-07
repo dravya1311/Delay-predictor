@@ -368,7 +368,7 @@ fig_prod = px.bar(
     y="category_name",
     orientation="h",
     color="avg_delay",
-    text=top5_delayed_category_name["avg_delay"].round(2)
+    text=top5_delayed_products["avg_delay"].round(2)
 )
 
 fig_prod.update_traces(textposition="outside")
