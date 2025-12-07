@@ -208,33 +208,33 @@ fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 7. Top 5 Most Sold Categories — Quantity + Revenue
+# 7. Top 8 Most Sold Categories — Quantity + Revenue
 # -------------------------------------------------------------
 
 
-cat_sales = (
-    df_view.groupby("category_name")
+product_sales = (
+    df_view.groupby("product_name")
     .agg({"order_item_quantity": "sum", "sales_per_customer": "sum"})
     .reset_index()
 )
 
-top_qty = cat_sales.sort_values("order_item_quantity", ascending=False).head(5)
-top_rev = cat_sales.sort_values("sales_per_customer", ascending=False).head(5)
+top_qty = product_sales.sort_values("order_item_quantity", ascending=False).head(8)
+top_rev = product_sales.sort_values("sales_per_customer", ascending=False).head(8)
 
 colA, colB = st.columns(2)
 
 with colA:
     fig = px.bar(
-        top_qty, x="category_name", y="order_item_quantity",
-        title="Top 5 Categories by Quantity Sold", text="order_item_quantity"
+        top_qty, x="product_name", y="order_item_quantity",
+        title="Top 5 Products by Quantity Sold", text="order_item_quantity"
     )
     fig.update_traces(textposition="outside", texttemplate="%{text:,}")
     st.plotly_chart(fig, use_container_width=True)
 
 with colB:
     fig = px.bar(
-        top_rev, x="category_name", y="sales_per_customer",
-        title="Top 5 Categories by Revenue in dollars", text="sales_per_customer"
+        top_rev, x="product_name", y="sales_per_customer",
+        title="Top 5 Products by Revenue in dollars", text="sales_per_customer"
     )
     fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
     st.plotly_chart(fig, use_container_width=True)
