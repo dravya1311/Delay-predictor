@@ -227,7 +227,7 @@ max_prod = prod_region.loc[prod_region.groupby("order_region")["profit_per_order
 
 fig = px.bar(
     max_prod, x="order_region", y="profit_per_order", color="product_name",
-    text="profit_per_order", title="Most Profitable Product per Region"
+    text="profit_per_order", 
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
