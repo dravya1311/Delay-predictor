@@ -291,7 +291,6 @@ delayed = (
 
 fig = px.bar(
     delayed, x="shipping_mode", y="delayed_count",
-    title="Delayed Orders by Shipping Mode",
     text="delayed_count", color="delayed_count", color_continuous_scale="Reds"
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:,}")
@@ -342,7 +341,6 @@ fig_std_delay = px.bar(
     x="order_region",
     y="delay_rate",
     text=delay_region_std["delay_rate"].round(2),
-    title="Delay % by Order-Region — Standard Class",
     color="delay_rate"
 )
 
@@ -375,7 +373,6 @@ fig_prod = px.bar(
     y="product_name",
     orientation="h",
     color="avg_delay",
-    title="Top 5 Most Delayed Products",
     text=top5_delayed_products["avg_delay"].round(2)
 )
 
