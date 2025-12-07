@@ -234,7 +234,7 @@ with colA:
 with colB:
     fig = px.bar(
         top_rev, x="product_name", y="sales_per_customer",
-        title="Top 5 Products by Revenue in dollars", text="Sales_per_customer"
+        title="Top 5 Products by Revenue in dollars", text="sales_per_customer"
     )
     fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
     st.plotly_chart(fig, use_container_width=True)
