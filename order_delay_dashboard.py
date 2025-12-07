@@ -273,7 +273,7 @@ pref = df_view.groupby(["order_region", "shipping_mode"]).size().reset_index(nam
 
 fig = px.bar(
     pref, x="order_region", y="count", color="shipping_mode",
-    title="Shipping Mode Preference by Region", text="count"
+   
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
