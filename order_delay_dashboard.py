@@ -207,7 +207,6 @@ cat_profit = (
 
 fig = px.bar(
     cat_profit, x="category_name", y="profit_per_order",
-    title="Top 8 Most Profitable Categories",
     text="profit_per_order", color="profit_per_order"
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
