@@ -121,25 +121,6 @@ with col4:
 st.markdown("---")
 
 # -------------------------------------------------------------
-# 1. Delayed Orders by Region
-# -------------------------------------------------------------
-st.subheader("Delayed Order count by Region")
-
-reg_grp = df_view.groupby("order_region")["is_delayed"].sum().reset_index()
-
-if not reg_grp.empty:
-    fig = px.bar(
-        reg_grp,
-        x="order_region",
-        y="is_delayed",
-        text="is_delayed",
-        color="is_delayed",
-        color_continuous_scale="Reds"
-    )
-    fig.update_traces(textposition="outside", texttemplate="%{text:,}")
-    st.plotly_chart(fig, use_container_width=True)
-else:
-    st.info("No data available.")
 
 # -------------------------------------------------------------
 # 2. Average Sales per Customer — Region
@@ -290,6 +271,26 @@ fig = px.bar(
 )
 fig.update_traces(textposition="outside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
+#-------------------------------------------------------------
+# 1. Delayed Orders by Region
+# -------------------------------------------------------------
+st.subheader("Delayed Order count by Region")
+
+reg_grp = df_view.groupby("order_region")["is_delayed"].sum().reset_index()
+
+if not reg_grp.empty:
+    fig = px.bar(
+        reg_grp,
+        x="order_region",
+        y="is_delayed",
+        text="is_delayed",
+        color="is_delayed",
+        color_continuous_scale="Reds"
+    )
+    fig.update_traces(textposition="outside", texttemplate="%{text:,}")
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info("No data available.")
 
 # -------------------------------------------------------------
 # 10. Delay % by Region (Donut)
