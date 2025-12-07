@@ -351,7 +351,7 @@ st.plotly_chart(fig_std_delay, use_container_width=True)
 # -------------------------------------------------------------
 st.subheader("Top 5 Most Delayed Products")
 # Average delay score per product
-prod_delay = (
+category_delay = (
    df_view.groupby("category_name")["label"]
     .mean()
     .reset_index()
@@ -359,16 +359,16 @@ prod_delay = (
 )
 
 # Select most delayed → lowest average delay (closest to -1)
-top5_delayed_products = prod_delay.nsmallest(5, "avg_delay")
+top5_delayed_category = category_delay.nsmallest(5, "avg_delay")
 
 # Plot
 fig_prod = px.bar(
-    top5_delayed_products,
+    top5_delayed_category,
     x="avg_delay",
     y="category_name",
     orientation="h",
     color="avg_delay",
-    text=top5_delayed_products["avg_delay"].round(2)
+    text=top5_delayed_category["avg_delay"].round(2)
 )
 
 fig_prod.update_traces(textposition="outside")
