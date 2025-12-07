@@ -356,7 +356,7 @@ st.plotly_chart(fig_std_delay, use_container_width=True)
 # ---------------------------------------------------------------
 # KPI: 5 Most Delayed Products
 # -------------------------------------------------------------
-
+st.subheader("Top 5 Most Delayed Products")
 # Average delay score per product
 prod_delay = (
    df_view.groupby("product_name")["label"]
