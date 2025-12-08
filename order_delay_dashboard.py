@@ -239,8 +239,9 @@ fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 7. Top 8 Most Sold Products — Quantity + Revenue
+# 7. Top 8 Most Sold Products —  Revenue
 # -------------------------------------------------------------
+st.subheader("Top 8 Products by Revenue in dollars")
 
 
 product_sales = (
@@ -253,7 +254,7 @@ top_rev = product_sales.sort_values("sales_per_customer", ascending=False).head(
 
 fig = px.bar(
         top_rev, x="product_name", y="sales_per_customer",
-        title="Top 8 Products by Revenue in dollars", text="sales_per_customer"
+        text="Revenue"
     )
 fig.update_traces(textposition="inside", texttemplate="%{text:.0f}")
 st.plotly_chart(fig, use_container_width=True)
