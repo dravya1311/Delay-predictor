@@ -254,7 +254,7 @@ top_rev = product_sales.sort_values("sales_per_customer", ascending=False).head(
 
 fig = px.bar(
         top_rev, x="product_name", y="sales_per_customer",
-        text="Revenue"
+        text="sales_per_customer"
     )
 fig.update_traces(textposition="inside", texttemplate="%{text:.0f}")
 st.plotly_chart(fig, use_container_width=True)
