@@ -245,22 +245,13 @@ st.plotly_chart(fig, use_container_width=True)
 
 product_sales = (
     df_view.groupby("product_name")
-    .agg({"order_item_quantity": "sum", "sales_per_customer": "sum"})
+    .agg({ "sales_per_customer": "sum"})
     .reset_index()
 )
 
-top_qty = product_sales.sort_values("order_item_quantity", ascending=False).head(8)
 top_rev = product_sales.sort_values("sales_per_customer", ascending=False).head(8)
 
-colA, colB = st.columns(2)
-
-with colA:
-    fig = px.bar(
-        top_qty, x="product_name", y="order_item_quantity",
-        title="Top 5 Products by Quantity Sold", text="order_item_quantity"
-    )
-    fig.update_traces(textposition="outside", texttemplate="%{text:,}")
-    st.plotly_chart(fig, use_container_width=True)
+colB = st.columns(2)
 
 with colB:
     fig = px.bar(
