@@ -146,7 +146,7 @@ fig = px.pie(
     names="order_status",
     values="percentage",
     title="Order Status Distribution ",
-    hole=0.4
+    hole=0.6
 )
 
 st.plotly_chart(fig, use_container_width=True)
