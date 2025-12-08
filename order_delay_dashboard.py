@@ -145,7 +145,7 @@ fig = px.pie(
     status_pct,
     names="order_status",
     values="percentage",
-    title="Order Status Distribution",
+    title="Order Status Distribution ",
     hole=0.4
 )
 
