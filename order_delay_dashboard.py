@@ -133,6 +133,7 @@ if required_col not in df.columns:
     st.stop()
 
 # Calculate percentage distribution
+st.subheader("Order Status Distribution")
 status_pct = (
     df[required_col]
     .value_counts(normalize=True) * 100
