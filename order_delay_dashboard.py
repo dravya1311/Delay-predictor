@@ -255,7 +255,7 @@ fig = px.bar(
         top_rev, x="product_name", y="sales_per_customer",
         title="Top 8 Products by Revenue in dollars", text="sales_per_customer"
     )
-fig.update_traces(textposition="outside", texttemplate="%{text:.0f}")
+fig.update_traces(textposition="outside", texttemplate="%${text:.0f}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
