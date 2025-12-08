@@ -154,7 +154,7 @@ st.plotly_chart(fig, use_container_width=True)
 # -------------------------------------------------------------
 # 4. Top 5 Order Country by Revenue
 # -------------------------------------------------------------
-st.subheader("Top 5 Countries by Sales Revenue")
+st.subheader("Top 5 Countries by Avg. Revenue")
 
 top_country = (
     df_view.groupby("order_country").size()
