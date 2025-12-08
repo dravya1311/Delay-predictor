@@ -76,7 +76,7 @@ df.columns = [norm_col(c) for c in df.columns]
 # Validate required columns
 required = [
     "label", "shipping_mode", "order_region", "order_country",
-    "sales_per_customer", "profit_per_order","Sales"
+    "sales_per_customer", "profit_per_order",
     "category_name", "product_name", "order_item_quantity"
 ]
 
@@ -253,8 +253,8 @@ product_sales = (
 top_rev = product_sales.sort_values("sales_per_customer", ascending=False).head(8)
 
 fig = px.bar(
-        top_rev, x="product_name", y="Sales",
-        text="Sales"
+        top_rev, x="product_name", y="sales_per_customer",
+        text="sales_per_customer"
     )
 fig.update_traces(textposition="inside", texttemplate="%{text:.0f}")
 st.plotly_chart(fig, use_container_width=True)
