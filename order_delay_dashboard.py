@@ -152,25 +152,25 @@ fig = px.pie(
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 4. Top 5 Order Country (by count)
+# 4. Top 5 Order Country by Revenue
 # -------------------------------------------------------------
-st.subheader("Top 5 Countries by No. of orders")
+st.subheader("Top 5 Countries by Sales Revenue")
 
 top_country = (
     df_view.groupby("order_country").size()
-    .reset_index(name="orders")
-    .sort_values("orders", ascending=False)
+    .reset_index(name="sales_per_customer")
+    .sort_values("sales_per_customer", ascending=False)
     .head(5)
 )
 
 fig = px.bar(
     top_country,
     x="order_country",
-    y="orders",
-    text="orders",
-    color="orders"
+    y="sales_per_customer",
+    text="sales_per_customer",
+    color="sales_per_customer"
 )
-fig.update_traces(textposition="outside", texttemplate="%{text:,}")
+fig.update_traces(textposition="inside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
