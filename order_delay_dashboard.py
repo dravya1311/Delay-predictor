@@ -220,27 +220,6 @@ fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 6. Most Profitable Product — Region-wise
-# -------------------------------------------------------------
-st.subheader("Most Profitable Products by Region")
-
-prod_region = (
-    df_view.groupby(["order_region", "product_name"])["profit_per_order"]
-    .mean().reset_index()
-)
-
-max_prod = prod_region.loc[prod_region.groupby("order_region")["profit_per_order"].idxmax()]
-
-fig = px.bar(
-    max_prod, x="order_region", y="profit_per_order", color="product_name",
-    text="profit_per_order", 
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
-st.plotly_chart(fig, use_container_width=True)
-
-# -------------------------------------------------------------
-
-
 # -------------------------------------------------------------
 # 8. Preferred Shipping Mode — Region (stacked)
 # -------------------------------------------------------------
