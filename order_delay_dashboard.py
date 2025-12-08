@@ -369,7 +369,6 @@ fig_prod = px.bar(
     y="product_name",
     orientation="h",
     color="avg_delay",
-    title="Top 5 Most Delayed Products",
     text=top5_delayed_products["avg_delay"].round(2)
 )
 
