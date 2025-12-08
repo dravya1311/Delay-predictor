@@ -256,7 +256,7 @@ fig = px.bar(
         title="Top 5 Products by Revenue in dollars", text="sales_per_customer"
     )
 fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
-    st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
 # 8. Preferred Shipping Mode — Region (stacked)
