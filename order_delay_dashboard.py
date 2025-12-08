@@ -274,25 +274,62 @@ fig.update_traces(textposition="outside", texttemplate="%{text:,}")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 9. Delayed Orders by Shipping Mode
+# 9. Delayed Orders by Shipping Mode (Percentage)
 # -------------------------------------------------------------
-st.subheader("Delayed Orders by Shipping Mode")
+st.subheader("Delayed Orders by Shipping Mode (%)")
 
-delayed = (
-    df_view[df_view["is_delayed"]]
-    .groupby("shipping_mode").size().reset_index(name="delayed_count")
-    .sort_values("delayed_count", ascending=False)
-)
+# Check columns exist
+if "shipping_mode" in df_view.columns and "is_delayed" in df_view.columns:
 
-fig = px.bar(
-    delayed, x="shipping_mode", y="delayed_count",
-    text="delayed_count", color="delayed_count", color_continuous_scale="Reds"
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:,}")
-st.plotly_chart(fig, use_container_width=True)
-#-------------------------------------------------------------
+    # Total orders by shipping mode
+    total_by_mode = (
+        df_view.groupby("shipping_mode")
+        .size()
+        .reset_index(name="total_orders")
+    )
 
-# -------------------------------------------------------------
+    # Delayed orders by shipping mode
+    delayed_by_mode = (
+        df_view[df_view["is_delayed"] == True]
+        .groupby("shipping_mode")
+        .size()
+        .reset_index(name="delayed_orders")
+    )
+
+    # Merge + calculate percentage
+    mode_delay_pct = (
+        total_by_mode.merge(delayed_by_mode, on="shipping_mode", how="left")
+        .fillna(0)
+    )
+    mode_delay_pct["delay_percentage"] = (
+        (mode_delay_pct["delayed_orders"] / mode_delay_pct["total_orders"]) * 100
+    )
+
+    # Sort descending by delay %
+    mode_delay_pct = mode_delay_pct.sort_values("delay_percentage", ascending=False)
+
+    # Plot
+    fig = px.bar(
+        mode_delay_pct,
+        x="shipping_mode",
+        y="delay_percentage",
+        text=mode_delay_pct["delay_percentage"].round(2),
+        color="delay_percentage",
+    )
+    fig.update_traces(
+        textposition="outside",
+        texttemplate="%{text:.2f}%",
+    )
+    fig.update_layout(
+        yaxis_title="Delay Percentage (%)",
+        xaxis_title="Shipping Mode"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+else:
+    st.error("Required columns missing: 'shipping_mode' or 'is_delayed'")
+
 # 10. Delay % by Region (Donut)
 # -------------------------------------------------------------
 st.subheader("Delay Percentage by Region")
