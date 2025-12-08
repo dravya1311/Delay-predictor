@@ -119,6 +119,37 @@ with col4:
     st.metric("Avg Sales per Customer ", f"${avg_sales:.2f}")
 
 st.markdown("---")
+import pandas as pd
+import plotly.express as px
+import streamlit as st
+
+# Load file
+df = pd.read_csv("Delay_Model.csv")
+
+# Validate column
+required_col = "order_status"
+if required_col not in df.columns:
+    st.error(f"Missing required column: {required_col}")
+    st.stop()
+
+# Calculate percentage distribution
+status_pct = (
+    df[required_col]
+    .value_counts(normalize=True) * 100
+).reset_index()
+
+status_pct.columns = ["order_status", "percentage"]
+
+# Pie Chart
+fig = px.pie(
+    status_pct,
+    names="order_status",
+    values="percentage",
+    title="Order Status Distribution",
+    hole=0.4
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
 # 4. Top 5 Order Country (by count)
