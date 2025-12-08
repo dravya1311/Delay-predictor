@@ -251,7 +251,6 @@ product_sales = (
 
 top_rev = product_sales.sort_values("sales_per_customer", ascending=False).head(8)
 
-colA = st.columns(2)
     fig = px.bar(
         top_rev, x="product_name", y="sales_per_customer",
         title="Top 5 Products by Revenue in dollars", text="sales_per_customer"
