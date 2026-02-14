@@ -1,401 +1,212 @@
 # -------------------------------------------------------------
-# order_delay_dashboard.py  (FINAL FULL VERSION)
+# SUPPLY CHAIN & LOGISTICS PERFORMANCE DASHBOARD
+# FINAL STABLE VERSION
 # -------------------------------------------------------------
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import os, re
+import os
+import re
 
 # -------------------------------------------------------------
 # PAGE CONFIG
 # -------------------------------------------------------------
 st.set_page_config(
     page_title="Supply Chain & Logistics Performance Dashboard",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
 # -------------------------------------------------------------
 # HEADER
 # -------------------------------------------------------------
-st.markdown(
-    """
-    <div style="background-color:#0A1A2F; padding:25px; border-radius:8px;">
-        <h1 style="color:white; text-align:center; font-size:42px; margin-bottom:5px;">
-            Supply Chain & Logistics Performance Dashboard
-        </h1>
-        <h3 style="color:#A3C4F3; text-align:center; font-weight:300; margin-top:0;">
-            Diagnostic Insights for E-commerce Delivery Performance
-        </h3>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.write(" ")
-
-ACCENT = "#0B6EFD"
-ALERT  = "#E03E3E"
-GOOD   = "#2CB67D"
-NEUTRAL = "#6C757D"
-
-# -------------------------------------------------------------
-# HELPERS
-# -------------------------------------------------------------
-def norm_col(c: str) -> str:
-    return re.sub(r'[^0-9a-z]+', '_', str(c).strip().lower())
-
-def try_load():
-    local = ["Delay_Model.csv", "Delay Model.csv", "Delay-Model.csv", "DelayModel.csv"]
-    for p in local:
-        if os.path.exists(p):
-            try: return pd.read_csv(p)
-            except: pass
-
-    base = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/"
-    gh = ["Delay_Model.csv", "Delay%20Model.csv", "Delay-Model.csv", "DelayModel.csv"]
-    for f in gh:
-        try: return pd.read_csv(base + f)
-        except: continue
-
-    return None
+st.markdown("""
+<div style="background-color:#0A1A2F;padding:22px;border-radius:8px">
+<h1 style="color:white;text-align:center;">Supply Chain & Logistics Performance Dashboard</h1>
+<h4 style="color:#A3C4F3;text-align:center;">Diagnostic Insights for Delivery Performance</h4>
+</div>
+""", unsafe_allow_html=True)
 
 # -------------------------------------------------------------
 # LOAD DATA
 # -------------------------------------------------------------
-df_raw = try_load()
-if df_raw is None:
-    st.error("Could not load Delay_Model.csv. Ensure file exists at repo root.")
-    st.stop()
+def load_data():
 
-df = df_raw.copy()
-df.columns = [norm_col(c) for c in df.columns]
+    local_files = ["Delay_Model.csv", "Delay Model.csv"]
 
-# Validate required columns
+    for f in local_files:
+        if os.path.exists(f):
+            return pd.read_csv(f)
+
+    github = "https://raw.githubusercontent.com/dravya1311/Delay-predictor/main/Delay_Model.csv"
+    return pd.read_csv(github)
+
+
+df = load_data()
+
+# -------------------------------------------------------------
+# COLUMN NORMALIZATION (CRITICAL FIX)
+# -------------------------------------------------------------
+df.columns = df.columns.str.strip().str.lower()
+
+# required columns
 required = [
-    "label", "shipping_mode", "order_region", "order_country",
-    "sales_per_customer", "profit_per_order",
-    "category_name", "product_name", "order_item_quantity"
+    "label",
+    "shipping mode",
+    "order region",
+    "order country",
+    "order city",
+    "customer country",
+    "customer city",
+    "sales per customer",
+    "profit per order",
+    "category name",
+    "product name"
 ]
 
 missing = [c for c in required if c not in df.columns]
+
 if missing:
-    st.error(f"Missing required columns: {missing}")
+    st.error(f"Missing columns: {missing}")
     st.stop()
 
-# Delay flag
-# -1 = delayed, 0 = on-time, 1 = early
+# delay flag
 df["is_delayed"] = df["label"] == -1
 
 # -------------------------------------------------------------
-# SIDEBAR FILTERS
+# FILTER
 # -------------------------------------------------------------
-st.sidebar.header("Filters")
+regions = ["All"] + sorted(df["order region"].dropna().unique())
+sel_region = st.sidebar.selectbox("Filter by Order Region", regions)
 
-region_list = ["All"] + sorted(df["order_region"].dropna().unique())
-sel_region = st.sidebar.selectbox("Order Region", region_list)
-
-df_view = df if sel_region == "All" else df[df["order_region"] == sel_region]
+df_view = df if sel_region == "All" else df[df["order region"] == sel_region]
 
 # -------------------------------------------------------------
 # KPI CARDS
 # -------------------------------------------------------------
-col1, col2, col3, col4 = st.columns(4)
+c1, c2, c3, c4 = st.columns(4)
 
 total_orders = len(df_view)
 delayed_orders = df_view["is_delayed"].sum()
 delay_rate = (delayed_orders / total_orders * 100) if total_orders else 0
-avg_sales = df_view["sales_per_customer"].mean()
+avg_sales = df_view["sales per customer"].mean()
 
-with col1:
-    st.metric("Total Orders", f"{total_orders:,}")
-with col2:
-    st.metric("Delayed Orders", f"{delayed_orders:,}")
-with col3:
-    st.metric("Delay Rate", f"{delay_rate:.1f}%")
-with col4:
-    st.metric("Avg Sales per Customer ", f"${avg_sales:.2f}")
+c1.metric("Total Orders", f"{total_orders:,}")
+c2.metric("Delayed Orders", f"{delayed_orders:,}")
+c3.metric("Delay %", f"{delay_rate:.1f}%")
+c4.metric("Avg Sales / Customer", f"${avg_sales:.2f}")
 
 st.markdown("---")
-import pandas as pd
-import plotly.express as px
-import streamlit as st
 
-# Load file
-df = pd.read_csv("Delay_Model.csv")
+# -------------------------------------------------------------
+# ORDER STATUS PIE
+# -------------------------------------------------------------
+status_pct = df_view["label"].value_counts(normalize=True) * 100
+status_pct = status_pct.reset_index()
+status_pct.columns = ["status", "pct"]
 
-# Validate column
-required_col = "order_status"
-if required_col not in df.columns:
-    st.error(f"Missing required column: {required_col}")
-    st.stop()
-
-# Calculate percentage distribution
-st.subheader("Order Status Distribution")
-status_pct = (
-    df[required_col]
-    .value_counts(normalize=True) * 100
-).reset_index()
-
-status_pct.columns = ["order_status", "percentage"]
-
-# Pie Chart
-fig = px.pie(
-    status_pct,
-    names="order_status",
-    values="percentage",
-    hole=0.5
-)
-
+fig = px.pie(status_pct, names="status", values="pct", hole=0.5)
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 4. Top 5 Order Country by Revenue
+# SALES BY REGION
 # -------------------------------------------------------------
-st.subheader("Top 5 Countries by Avg. Revenue")
+grp = df_view.groupby("order region")["sales per customer"].mean().reset_index()
 
-top_country = (
-    df_view.groupby("order_country").size()
-    .reset_index(name="sales_per_customer")
-    .sort_values("sales_per_customer", ascending=False)
-    .head(5)
-)
+fig = px.bar(grp, x="order region", y="sales per customer",
+             text=grp["sales per customer"].round(2),
+             color="sales per customer")
 
-fig = px.bar(
-    top_country,
-    x="order_country",
-    y="sales_per_customer",
-    text="sales_per_customer",
-    color="sales_per_customer"
-)
-fig.update_traces(textposition="inside", texttemplate="%{text:,}")
+fig.update_traces(textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 2. Average Sales per Customer — Region
+# PROFIT BY REGION
 # -------------------------------------------------------------
-st.subheader("Average Sales per Customer by Region ($)")
+grp = df_view.groupby("order region")["profit per order"].mean().reset_index()
 
-grp = df_view.groupby("order_region")["sales_per_customer"].mean().reset_index()
+fig = px.bar(grp, x="order region", y="profit per order",
+             text=grp["profit per order"].round(2),
+             color="profit per order")
 
-fig = px.bar(
-    grp, x="order_region", y="sales_per_customer",
-    text="sales_per_customer", color="sales_per_customer"
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+fig.update_traces(textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 3. Average Profit per Order — Region
+# TOP PROFITABLE CATEGORIES
 # -------------------------------------------------------------
-st.subheader("Average Profit per Order by Region ($)")
-
-grp = df_view.groupby("order_region")["profit_per_order"].mean().reset_index()
-
-fig = px.bar(
-    grp, x="order_region", y="profit_per_order",
-    text="profit_per_order", color="profit_per_order"
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
-st.plotly_chart(fig, use_container_width=True)
-
-
-# -------------------------------------------------------------
-# 5. Top 8 Most Profitable Categories
-# -------------------------------------------------------------
-st.subheader("Top 8 Most Profitable Categories")
-
-cat_profit = (
-    df_view.groupby("category_name")["profit_per_order"]
-    .mean().reset_index().sort_values("profit_per_order", ascending=False).head(8)
+cat = (
+    df_view.groupby("category name")["profit per order"]
+    .mean().reset_index()
+    .sort_values("profit per order", ascending=False)
+    .head(8)
 )
 
-fig = px.bar(
-    cat_profit, x="category_name", y="profit_per_order",
-    text="profit_per_order", color="profit_per_order"
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:.2f}")
+fig = px.bar(cat, x="category name", y="profit per order",
+             text=cat["profit per order"].round(2),
+             color="profit per order")
+
+fig.update_traces(textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
+# DELAY % BY SHIPPING MODE
 # -------------------------------------------------------------
-# 8. Preferred Shipping Mode — Region (stacked)
-# -------------------------------------------------------------
-st.subheader("Preferred Shipping Mode by Region")
+total_mode = df_view.groupby("shipping mode").size().reset_index(name="total")
+delay_mode = df_view[df_view["is_delayed"]].groupby("shipping mode").size().reset_index(name="delay")
 
-pref = df_view.groupby(["order_region", "shipping_mode"]).size().reset_index(name="count")
+mode = total_mode.merge(delay_mode, on="shipping mode", how="left").fillna(0)
+mode["delay_pct"] = (mode["delay"] / mode["total"]) * 100
 
-fig = px.bar(
-    pref, x="order_region", y="count", color="shipping_mode",
-    text="count" 
-)
-fig.update_traces(textposition="outside", texttemplate="%{text:,}")
+fig = px.bar(mode, x="shipping mode", y="delay_pct",
+             text=mode["delay_pct"].round(2),
+             color="delay_pct")
+
+fig.update_traces(textposition="outside", texttemplate="%{text:.2f}%")
 st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------------------
-# 9. Delayed Orders by Shipping Mode (Percentage)
+# TOP 5 MOST DELAYED PRODUCTS
 # -------------------------------------------------------------
-st.subheader("Delayed Orders by Shipping Mode (%)")
-
-# Check columns exist
-if "shipping_mode" in df_view.columns and "is_delayed" in df_view.columns:
-
-    # Total orders by shipping mode
-    total_by_mode = (
-        df_view.groupby("shipping_mode")
-        .size()
-        .reset_index(name="total_orders")
-    )
-
-    # Delayed orders by shipping mode
-    delayed_by_mode = (
-        df_view[df_view["is_delayed"] == True]
-        .groupby("shipping_mode")
-        .size()
-        .reset_index(name="delayed_orders")
-    )
-
-    # Merge + calculate percentage
-    mode_delay_pct = (
-        total_by_mode.merge(delayed_by_mode, on="shipping_mode", how="left")
-        .fillna(0)
-    )
-    mode_delay_pct["delay_percentage"] = (
-        (mode_delay_pct["delayed_orders"] / mode_delay_pct["total_orders"]) * 100
-    )
-
-    # Sort descending by delay %
-    mode_delay_pct = mode_delay_pct.sort_values("delay_percentage", ascending=False)
-
-    # Plot
-    fig = px.bar(
-        mode_delay_pct,
-        x="shipping_mode",
-        y="delay_percentage",
-        text=mode_delay_pct["delay_percentage"].round(2),
-        color="delay_percentage",
-    )
-    fig.update_traces(
-        textposition="outside",
-        texttemplate="%{text:.2f}%",
-    )
-    fig.update_layout(
-        yaxis_title="Delay Percentage (%)",
-        xaxis_title="Shipping Mode"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-else:
-    st.error("Required columns missing: 'shipping_mode' or 'is_delayed'")
-
-# 10. Delay % by Region (Donut)
-# -------------------------------------------------------------
-st.subheader("Delay Percentage by Region")
-
-reg_delay = (
-    df_view.groupby("order_region")["is_delayed"].mean().reset_index()
-)
-reg_delay["delay_pct"] = reg_delay["is_delayed"] * 100
-
-fig = go.Figure(
-    go.Pie(
-        labels=reg_delay["order_region"],
-        values=reg_delay["delay_pct"],
-        hole=0.45,
-        textinfo="label+percent",
-    )
+prod = (
+    df_view.groupby("product name")["label"]
+    .mean().reset_index()
+    .nsmallest(5, "label")
 )
 
+fig = px.bar(prod, x="label", y="product name", orientation="h",
+             text=prod["label"].round(2), color="label")
+
+fig.update_traces(textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
-#-----------------------------------------------------------------
-# KPI: Delay breakup by order-region for STANDARD CLASS only
-# ---------------------------------------------------------------
-st.subheader("Delay Breakup by Order-Region (Standard Class)")
 
-# Use filtered dataframe instead of df_view
-std_df = df_view[df_view["shipping_mode"] == "Standard Class"].copy()
-
-# Identify delayed orders (label = -1)
-std_df["is_delayed"] = std_df["label"] == -1
-
-# Group by region
-delay_region_std = (
-    std_df.groupby("order_region")["is_delayed"]
-    .mean()
-    .reset_index()
-    .rename(columns={"is_delayed": "delay_rate"})
-)
-
-# Graph
-fig_std_delay = px.bar(
-    delay_region_std,
-    x="order_region",
-    y="delay_rate",
-    text=delay_region_std["delay_rate"].round(2),
-    color="delay_rate"
-)
-
-fig_std_delay.update_traces(textposition="outside")
-fig_std_delay.update_layout(
-    yaxis_title="Delay Rate (0 = none, 1 = fully delayed)",
-    xaxis_title="Order Region"
-)
-
-st.plotly_chart(fig_std_delay, use_container_width=True)
-# ---------------------------------------------------------------
-# KPI: 5 Most Delayed Products
 # -------------------------------------------------------------
-st.subheader("Top 5 Most Delayed Products")
-
-# Average delay score per product
-prod_delay = (
-    df_view.groupby("product_name")["label"]
-    .mean()
-    .reset_index()
-    .rename(columns={"label": "avg_delay"})
+# TOP 10 MOST DELAYED ROUTES
+# -------------------------------------------------------------
+df_view["route"] = (
+    df_view["order city"].astype(str) + " → " +
+    df_view["customer city"].astype(str)
 )
 
-# Select most delayed → lowest average delay (closest to -1)
-top5_delayed_products = prod_delay.nsmallest(5, "avg_delay")
-
-# Plot
-fig_prod = px.bar(
-    top5_delayed_products,
-    x="avg_delay",
-    y="product_name",
-    orientation="h",
-    color="avg_delay",
-    text=top5_delayed_products["avg_delay"].round(2)
+routes = (
+    df_view.groupby("route")["label"]
+    .mean().reset_index()
+    .nsmallest(10, "label")
 )
 
-fig_prod.update_traces(textposition="outside")
-fig_prod.update_layout(
-    xaxis_title="Avg Delay Score (-1 = Worst)",
-    yaxis_title="Product"
-)
+fig = px.bar(routes, x="label", y="route", orientation="h",
+             text=routes["label"].round(2), color="label")
 
-st.plotly_chart(fig_prod, use_container_width=True)
+fig.update_traces(textposition="outside")
+st.plotly_chart(fig, use_container_width=True)
 
+# -------------------------------------------------------------
 # FOOTER
 # -------------------------------------------------------------
 st.markdown("---")
-st.markdown(
-    """
-    <div style="
-        position: fixed;
-        bottom: 10px;
-       left: 15px;
-        color: #A3C4F3;
-        font-size: 16px;
-        font-weight: 500;
-    ">
-        Developed by <span style="color:#0B6EFD;">Ravindra Yadav</span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-
+st.markdown("""
+<div style="position:fixed;bottom:10px;right:15px;color:#A3C4F3;">
+Developed by <b style="color:#0B6EFD;">Ravindra Yadav</b>
+</div>
+""", unsafe_allow_html=True)
