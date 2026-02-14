@@ -1,5 +1,6 @@
+streamlit==1.32.2
+altair==5.3.0
 pandas
 numpy
-scikit-learn
 plotly
-streamlit
+scikit-learn
